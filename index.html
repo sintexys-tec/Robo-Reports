@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reportar Bug · Robô Automático</title>
+    <style>
+        /* ===== BASE ===== */
+        :root {
+            --bg: #0a0a0f;
+            --surface: #13131a;
+            --surface2: #1a1a24;
+            --primary: #ffe600;
+            --primary-glow: rgba(255, 230, 0, 0.25);
+            --text: #e8e8ed;
+            --text-secondary: #a0a0b8;
+            --accent: #00d4aa;
+            --accent-glow: rgba(0, 212, 170, 0.3);
+            --whatsapp: #25D366;
+            --border: rgba(255, 255, 255, 0.08);
+            --radius: 8px;
+            --shadow-lg: 0 25px 60px rgba(0, 0, 0, 0.5);
+            --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+            --danger: #ff5f56;
+            --danger-glow: rgba(255, 95, 86, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font);
+            background:
+                radial-gradient(circle at 15% 8%, rgba(255, 230, 0, 0.08), transparent 30%),
+                radial-gradient(circle at 85% 88%, rgba(0, 212, 170, 0.08), transparent 32%),
+                var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.035;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.5) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            z-index: 10;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(10, 10, 15, 0.78);
+            position: sticky;
+            top: 0;
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+            gap: 16px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.35rem;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: var(--primary);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.18rem;
+            color: #1a1a0a;
+            box-shadow: 0 8px 24px var(--primary-glow);
+        }
+
+        .nav-cta {
+            background: var(--primary);
+            color: #1a1a0a;
+            border: none;
+            min-height: 42px;
+            padding: 0 20px;
+            border-radius: var(--radius);
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-cta:hover {
+            background: #fff;
+            box-shadow: 0 8px 28px var(--primary-glow);
+            transform: translateY(-2px);
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            position: relative;
+            z-index: 1;
+            padding: 60px 0 40px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.2rem, 5vw, 3.2rem);
+            font-weight: 850;
+            letter-spacing: 0;
+            line-height: 1.15;
+            margin-bottom: 12px;
+            animation: fadeInUp 0.7s ease-out 0.1s both;
+        }
+
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--primary) 0%, #ffb800 50%, #ff8c00 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 30px;
+            animation: fadeInUp 0.7s ease-out 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== BUGS CONHECIDOS ===== */
+        .known-bugs {
+            position: relative;
+            z-index: 1;
+            padding: 20px 0 50px;
+        }
+
+        .known-bugs .section-title {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .section-title h2 {
+            font-size: 2rem;
+            font-weight: 850;
+            letter-spacing: 0;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .bug-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 18px;
+        }
+
+        .bug-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 22px;
+            transition: all 0.25s ease;
+        }
+
+        .bug-card:hover {
+            border-color: rgba(255, 255, 255, 0.18);
+            transform: translateY(-3px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+            background: var(--surface2);
+        }
+
+        .bug-card .bug-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 750;
+            font-size: 1.05rem;
+            margin-bottom: 6px;
+        }
+
+        .bug-card .bug-title .bug-icon {
+            font-size: 1.2rem;
+        }
+
+        .bug-card .bug-desc {
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+        }
+
+        .bug-card .bug-solution {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+            font-size: 0.88rem;
+            color: var(--accent);
+        }
+
+        .bug-card .bug-solution strong {
+            color: var(--text);
+        }
+
+        /* ===== FORM ===== */
+        .report-section {
+            position: relative;
+            z-index: 1;
+            padding: 20px 0 70px;
+        }
+
+        .report-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 40px 36px;
+            max-width: 720px;
+            margin: 0 auto;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .report-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius);
+            padding: 1px;
+            background: linear-gradient(135deg, var(--primary), transparent 50%, var(--accent));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .report-card h3 {
+            font-size: 1.6rem;
+            font-weight: 850;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+
+        .report-card .sub {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 28px;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+        }
+
+        .form-group label .required {
+            color: var(--danger);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            background: #0d0d16;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.95rem;
+            transition: border 0.2s ease;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        .form-control::placeholder {
+            color: #555;
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a0a0b8' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .btn-submit {
+            background: var(--accent);
+            color: #051510;
+            font-size: 1.05rem;
+            font-weight: 800;
+            min-height: 54px;
+            padding: 0 32px;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 12px 35px var(--accent-glow);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .btn-submit:hover {
+            background: #00f0c0;
+            box-shadow: 0 18px 45px rgba(0, 212, 170, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1a2a1f;
+            color: #b0f0c0;
+            border: 1px solid rgba(0, 212, 170, 0.4);
+            padding: 14px 24px;
+            border-radius: var(--radius);
+            font-weight: 700;
+            font-size: 0.9rem;
+            z-index: 999;
+            transition: transform 0.35s ease;
+            pointer-events: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-align: center;
+            max-width: 90%;
+        }
+
+        .toast.error {
+            background: #2a1414;
+            color: #ff8a8a;
+            border-color: rgba(255, 95, 86, 0.4);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            position: relative;
+            z-index: 1;
+            border-top: 1px solid var(--border);
+            padding: 24px 0;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 18px;
+            }
+            .nav-inner {
+                padding: 0 18px;
+            }
+            .hero {
+                padding: 40px 0 30px;
+            }
+            .hero h1 {
+                font-size: 1.9rem;
+            }
+            .hero p {
+                font-size: 1rem;
+            }
+            .report-card {
+                padding: 28px 18px;
+            }
+            .report-card h3 {
+                font-size: 1.3rem;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+            .nav-cta {
+                padding: 0 14px;
+                font-size: 0.82rem;
+            }
+            .logo {
+                font-size: 1.08rem;
+            }
+            .logo-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+            .bug-grid {
+                grid-template-columns: 1fr;
+            }
+            .toast {
+                width: calc(100% - 28px);
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-grid"></div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">✅ Bug reportado com sucesso!</div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="nav-inner">
+            <a href="#" class="logo">
+                <div class="logo-icon">R</div>
+                Robô Automático
+            </a>
+            <a href="#reportar" class="nav-cta">Reportar Bug</a>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main>
+
+        <!-- HERO -->
+        <section class="hero">
+            <div class="container">
+                <h1>
+                    Reporte <span class="highlight">bugs &amp; erros</span><br />
+                    do robô e do e-book
+                </h1>
+                <p>
+                    Encontrou algum problema no funcionamento do robô ou no guia oficial?
+                    Use o formulário abaixo para nos avisar. Sua ajuda é essencial para melhorarmos!
+                </p>
+            </div>
+        </section>
+
+        <!-- BUGS CONHECIDOS -->
+        <section class="known-bugs">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Problemas comuns (já mapeados)</h2>
+                    <p>Antes de reportar, veja se o seu bug já está na lista — muitos têm solução rápida.</p>
+                </div>
+                <div class="bug-grid">
+
+                    <div class="bug-card">
+                        <div class="bug-title">
+                            <span class="bug-icon">🖥️</span>
+                            SmartScreen bloqueia o instalador
+                        </div>
+                        <div class="bug-desc">O Windows mostra um aviso azul “O Windows protegeu o seu PC” ao abrir o .exe.</div>
+                        <div class="bug-solution"><strong>Solução:</strong> Clique em “Mais informações” e depois em “Executar mesmo assim”. É um falso positivo.</div>
+                    </div>
+
+                    <div class="bug-card">
+                        <div class="bug-title">
+                            <span class="bug-icon">📱</span>
+                            Pede QR Code toda vez que inicia
+                        </div>
+                        <div class="bug-desc">O robô não salva a sessão do WhatsApp Web e pede escaneamento a cada execução.</div>
+                        <div class="bug-solution"><strong>Solução:</strong> Deixe o robô enviar pelo menos 1 mensagem antes de fechar. A sessão é salva automaticamente.</div>
+                    </div>
+
+                    <div class="bug-card">
+                        <div class="bug-title">
+                            <span class="bug-icon">🔑</span>
+                            Chave da Groq inválida ou expirada
+                        </div>
+                        <div class="bug-desc">O robô retorna erro “503 Service Unavailable” ou não gera textos.</div>
+                        <div class="bug-solution"><strong>Solução:</strong> Acesse console.groq.com, crie uma nova chave (gsk_...) e atualize no configurador.</div>
+                    </div>
+
+                    <div class="bug-card">
+                        <div class="bug-title">
+                            <span class="bug-icon">📤</span>
+                            Mensagem não chega no grupo
+                        </div>
+                        <div class="bug-desc">O nome do grupo foi digitado errado (com acentos, emojis ou maiúsculas diferentes).</div>
+                        <div class="bug-solution"><strong>Solução:</strong> Copie o nome exato do grupo (segure 1s sobre o nome no WhatsApp) e cole na configuração.</div>
+                    </div>
+
+                    <div class="bug-card">
+                        <div class="bug-title">
+                            <span class="bug-icon">🚫</span>
+                            Antivírus bloqueia o robô (Avast, McAfee)
+                        </div>
+                        <div class="bug-desc">O antivírus interrompe a execução por suspeitar do controle do navegador.</div>
+                        <div class="bug-solution"><strong>Solução:</strong> Adicione a pasta “Robo Automatico” às exceções do antivírus ou desative por 10 min durante a instalação.</div>
+                    </div>
+
+                    <div class="bug-card">
+                        <div class="bug-title">
+                            <span class="bug-icon">⏳</span>
+                            Robô não encontra ofertas
+                        </div>
+                        <div class="bug-desc">O robô fica buscando, mas nunca envia nada. Pode ser falta de promoções com desconto ≥ 20%.</div>
+                        <div class="bug-solution"><strong>Solução:</strong> Reduza o desconto mínimo no configurador (ex: 15%) ou aumente o preço máximo. Deixe rodando — ofertas aparecem.</div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- FORMULÁRIO -->
+        <section class="report-section" id="reportar">
+            <div class="container">
+                <div class="report-card">
+                    <h3>📋 Reportar novo bug</h3>
+                    <p class="sub">Preencha com o máximo de detalhes possível. Assim conseguimos corrigir mais rápido.</p>
+
+                    <form id="bugForm" novalidate>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nome">Seu nome <span class="required">*</span></label>
+                                <input type="text" id="nome" class="form-control" placeholder="Ex: João Silva" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="email">E-mail <span class="required">*</span></label>
+                                <input type="email" id="email" class="form-control" placeholder="joao@email.com" required />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tipo">Onde está o problema? <span class="required">*</span></label>
+                            <select id="tipo" class="form-control" required>
+                                <option value="">Selecione...</option>
+                                <option value="robo">Robô (execução, instalação, envio)</option>
+                                <option value="ebook">E-book (guia, instruções, links)</option>
+                                <option value="site">Site (esta página)</option>
+                                <option value="outro">Outro</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="descricao">Descreva o bug com detalhes <span class="required">*</span></label>
+                            <textarea id="descricao" class="form-control" placeholder="O que aconteceu? Como reproduzir? Qual mensagem de erro apareceu?" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="passos">Passos para reproduzir (opcional)</label>
+                            <input type="text" id="passos" class="form-control" placeholder="Ex: 1. Abri o robô; 2. Cliquei em configurar; 3. Apareceu erro X." />
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 28px;">
+                            <label for="anexo">Anexar imagem / log (opcional)</label>
+                            <input type="file" id="anexo" class="form-control" accept=".png,.jpg,.jpeg,.gif,.log,.txt" />
+                        </div>
+
+                        <button type="submit" class="btn-submit" id="submitBtn">
+                            🚀 Enviar reporte
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <p>2026 · Robô Automático · Esta ferramenta não é afiliada ao Mercado Livre.</p>
+            <p style="margin-top: 4px; font-size: 0.75rem; color: #666;">Reporte de bugs — sua contribuição é fundamental.</p>
+        </div>
+    </footer>
+
+    <script>
+        (function() {
+            const form = document.getElementById('bugForm');
+            const toast = document.getElementById('toast');
+            const submitBtn = document.getElementById('submitBtn');
+            let toastTimer = null;
+
+            // Webhook do Discord
+            const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1501253427760468018/vnv4D5sRLpne5xdReeVDFmUOhTWw80Jd56M0RdeNM9n93WFFDErzP4dU3lZBKSPgyyol';
+
+            function showToast(message, isError = false) {
+                toast.textContent = message;
+                toast.classList.remove('error');
+                if (isError) toast.classList.add('error');
+                toast.classList.add('show');
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 6000);
+            }
+
+            async function sendToDiscord(data) {
+                const embed = {
+                    title: '🐞 Novo bug reportado',
+                    color: 0xffe600, // amarelo
+                    fields: [
+                        { name: '👤 Nome', value: data.nome || 'Não informado', inline: true },
+                        { name: '📧 E-mail', value: data.email || 'Não informado', inline: true },
+                        { name: '📂 Tipo', value: data.tipo || 'Não informado', inline: true },
+                        { name: '📝 Descrição', value: data.descricao || 'Sem descrição', inline: false },
+                        { name: '🔁 Passos para reproduzir', value: data.passos || 'Não informado', inline: false },
+                    ],
+                    timestamp: new Date().toISOString(),
+                    footer: { text: 'Robô Automático · Reporte de Bugs' }
+                };
+
+                const payload = {
+                    embeds: [embed],
+                    username: 'Bug Reporter',
+                    avatar_url: 'https://i.imgur.com/5D9l6g8.png' // ícone genérico
+                };
+
+                const response = await fetch(DISCORD_WEBHOOK, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status} - ${errorText}`);
+                }
+                return response;
+            }
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                // Validação
+                const nome = document.getElementById('nome').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const tipo = document.getElementById('tipo').value;
+                const descricao = document.getElementById('descricao').value.trim();
+                const passos = document.getElementById('passos').value.trim();
+
+                if (!nome) {
+                    showToast('⚠️ Por favor, informe seu nome.', true);
+                    document.getElementById('nome').focus();
+                    return;
+                }
+                if (!email || !email.includes('@')) {
+                    showToast('⚠️ Informe um e-mail válido.', true);
+                    document.getElementById('email').focus();
+                    return;
+                }
+                if (!tipo) {
+                    showToast('⚠️ Selecione o tipo de problema.', true);
+                    document.getElementById('tipo').focus();
+                    return;
+                }
+                if (!descricao || descricao.length < 10) {
+                    showToast('⚠️ Descreva o bug com pelo menos 10 caracteres.', true);
+                    document.getElementById('descricao').focus();
+                    return;
+                }
+
+                // Desabilitar botão durante envio
+                submitBtn.disabled = true;
+                submitBtn.textContent = '⏳ Enviando...';
+
+                try {
+                    const data = { nome, email, tipo, descricao, passos };
+                    await sendToDiscord(data);
+
+                    showToast('✅ Bug reportado com sucesso! Obrigado pela colaboração.');
+                    form.reset();
+                } catch (err) {
+                    console.error('Erro ao enviar para Discord:', err);
+                    showToast('❌ Erro ao enviar reporte. Tente novamente mais tarde.', true);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '🚀 Enviar reporte';
+                }
+            });
+
+            // Efeito de scroll no header
+            window.addEventListener('scroll', () => {
+                const header = document.querySelector('header');
+                header.style.boxShadow = window.scrollY > 20 ? '0 4px 30px rgba(0,0,0,0.5)' : 'none';
+            });
+
+            // Limpar borda vermelha ao focar
+            document.querySelectorAll('.form-control').forEach(el => {
+                el.addEventListener('focus', () => {
+                    el.style.borderColor = '';
+                });
+            });
+        })();
+    </script>
+
+</body>
+</html>
